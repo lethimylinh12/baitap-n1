@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>30/4 Ngày Toàn Thắng</title>
     
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Oswald:wght@700&family=Playfair+Display:wght@700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Oswald:wght@700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     
     <style>
         :root {
@@ -19,23 +22,24 @@
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        /* ==========================================================
-           1. THIẾT LẬP CHUNG VÀ NỀN BẢN ĐỒ (SẮC NÉT 100%)
-           ========================================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
+        
         body { 
             width: 100%; font-family: 'Times New Roman', serif; transition: 0.4s ease; 
-            /* NỀN CỐ ĐỊNH, HIỂN THỊ RÕ RÀNG KHÔNG MỜ */
-            background: url('nen1.png') center/cover fixed no-repeat; 
+            position: relative; background-color: #2b080b;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('nen1.png') center/cover no-repeat;
+            z-index: -1; 
+            filter: contrast(1.15) saturate(1.2) brightness(0.85); 
         }
         
-        /* ĐÃ XÓA OVERFLOW-X: HIDDEN ĐỂ THANH MENU KHÔNG BỊ MẤT KHI CUỘN */
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; background: transparent; }
 
-        /* ==========================================================
-           2. BANNER TOÀN THẮNG
-           ========================================================== */
+        /* ==================== BANNER ==================== */
         .banner-half { height: 45vh; position: relative; overflow: hidden; background: #0b5fb3; }
         .tank-bg { position: absolute; inset: 0; z-index: 1; }
         .tank-bg img { width: 100%; height: 100%; object-fit: cover; }
@@ -44,262 +48,178 @@
         .brand { position: absolute; top: 8vh; left: 2vw; text-align: center; z-index: 10; }
         .logo { width: 18vw; height: auto; }
         .brand-name { font-family: 'Montserrat', sans-serif; color: #f3ff09; font-size: 2.2vw; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-top: 10px; }
-        .slogan .txt { font-family: 'Oswald', sans-serif; position: absolute; color: #ffcc00; font-size: 2.1vw; font-weight: bold; text-shadow: 2px 2px 8px #000; z-index: 20; }
-        .t1{top:1vh;left:43vw}.t2{top:6vh;left:43vw}.t3{top:3vh;left:49vw}.t4{top:12vh;left:42vw}.t5{top:9vh;left:47vw}.t6{top:15vh;left:45vw}.t7{top:18vh;left:38vw}.t8{top:21vh;left:43vw}.t9{top:24vh;left:36vw}.t10{top:27vh;left:41vw}.t11{top:30vh;left:36vw}.t12{top:33vh;left:39vw}.t13{top:36vh;left:32vw}
-
-        /* ==========================================================
-           3. MENU DÍNH TRẦN (ĐÃ FIX LỖI MẤT KHI CUỘN)
-           ========================================================== */
-        .red-nav { background: #b30000; z-index: 1000; position: sticky; top: 0; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .main-menu { display: flex; justify-content: center; list-style: none; flex-wrap: wrap; margin: 0; padding: 0;}
-        .main-menu > li { position: relative; }
-        .main-menu > li > a { display: block; padding: 15px 25px; color: #fff; text-decoration: none; font-weight: bold; font-size: 22px; transition: 0.3s; border-left: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
-        .main-menu > li:hover > a { background: #00aaff; }
-        .submenu { display: none; position: absolute; top: 100%; left: 0; background: #fff; min-width: 240px; border: 2px solid #00aaff; border-radius: 0 0 20px 20px; list-style: none; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1001; padding: 0;}
-        .main-menu > li:hover .submenu { display: block; }
-        .submenu li a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 18px; border-bottom: 1px solid #eee; text-align: left; }
-        .submenu li a:hover { background: #f0f8ff; color: #00aaff; }
-
-        /* ==========================================================
-           4. BỐ CỤC KHỐI TRẮNG - VIỀN ĐỎ CHUẨN XÁC
-           ========================================================== */
-        .container { max-width: 1000px; margin: 50px auto; padding: 0 20px; }
-        section { margin-bottom: 80px; scroll-margin-top: 100px; }
-        .main-title { text-align: center; color: #b30000; font-size: 2.8em; margin-bottom: 50px; text-transform: uppercase; font-weight:bold; background: rgba(255,255,255,0.9); display: inline-block; padding: 10px 30px; border-radius: 10px; border: 3px solid #b30000; left: 50%; position: relative; transform: translateX(-50%); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
-        .article-block { background: rgba(255, 255, 255, 0.95); padding: 40px; border-radius: 15px; border: 4px solid #b30000; box-shadow: 0 15px 40px rgba(0,0,0,0.3); margin-bottom: 40px; line-height: 1.8; }
+       
+    .slogan { display: block; } /* Giữ lại class cha để ko bị lỗi */
+        .slogan .txt { 
+            font-family: 'Oswald', sans-serif; 
+            position: absolute; 
+            color: #ffcc00; 
+            font-size: 2.1vw; 
+            font-weight: bold; 
+            text-shadow: 2px 2px 8px #000; 
+            z-index: 20; 
+        }
+        .t1{top:1vh;left:43vw} .t2{top:6vh;left:43vw} .t3{top:3vh;left:49vw} .t4{top:12vh;left:42vw}
+        .t5{top:9vh;left:47vw} .t6{top:15vh;left:45vw} .t7{top:18vh;left:38vw} .t8{top:21vh;left:43vw}
+        .t9{top:24vh;left:36vw} .t10{top:27vh;left:41vw} .t11{top:30vh;left:36vw} .t12{top:33vh;left:39vw}
+        .t13{top:36vh;left:32vw}
 
-        /* VĂN BẢN VÀ NÚT ĐỌC THÊM */
-        .clamp-text { font-size: 1.25em; text-align: justify; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: 0.3s ease; }
+        /* ==================== MENU ==================== */
+       .red-nav { 
+    background: url('rong.png') bottom center / cover no-repeat; 
+    z-index: 1000; 
+    position: sticky; 
+    top: 0; 
+    width: 100%; 
+    min-height: 80px; 
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4); 
+    border-bottom: 3px solid #e6b906;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}
+        .main-menu { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    list-style: none; 
+    flex-wrap: wrap; 
+    margin: 0; 
+    padding: 0; 
+    width: 100%;
+}
+
+.main-menu > li { 
+    position: relative; 
+}
+
+.main-menu > li > a { 
+    display: inline-block; 
+    padding: 10px 18px; 
+    margin: 8px 5px; 
+    color: #ffcc00; 
+    text-decoration: none; 
+    font-weight: 900; 
+    font-size: 18px; 
+    transition: 0.3s; 
+    background: rgba(247, 5, 5, 0.6); 
+    border: 2px solid #ffcc00; 
+    border-radius: 8px; 
+    text-shadow: 2px 2px 4px #000;
+    white-space: nowrap; 
+}
+
+.main-menu > li:hover > a { 
+    background: #ffcc00; 
+    color: #b30000; 
+    box-shadow: 0 0 15px #ffcc00;
+    transform: translateY(-2px);
+}
+
+        .submenu { display: none; position: absolute; top: 100%; left: 0; background: #fff; min-width: 240px; border-bottom: 4px solid #b30000; border-radius: 0 0 12px 12px; list-style: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1001; padding: 5px 0; overflow: hidden;}
+        .main-menu > li:hover .submenu { display: block; animation: fadeInMenu 0.3s ease; }
+        @keyframes fadeInMenu { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .submenu li a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 17px; text-align: left; transition: 0.2s;}
+        .submenu li a:hover { background: #f9f9f9; color: #b30000; padding-left: 25px; }
+
+        /* ==================== BỐ CỤC NỘI DUNG ==================== */
+        .container { max-width: 1050px; margin: 60px auto; padding: 0 20px; }
+        section { margin-bottom: 80px; scroll-margin-top: 100px; }
+        
+        .main-title { 
+            text-align: center; color: #b30000; font-size: 2.8em; margin-bottom: 50px; 
+            text-transform: uppercase; font-weight: 900; background: #ffffff; 
+            display: inline-block; padding: 15px 45px; border-radius: 12px; 
+            border: 2px solid #b30000; border-bottom: 6px solid #b30000; 
+            position: relative; left: 50%; transform: translateX(-50%); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-family: 'Playfair Display', serif; letter-spacing: 1px;
+        }
+        
+        .article-block { 
+            background: rgba(255, 255, 255, 0.97); padding: 45px; border-radius: 16px; 
+            border: 2px solid #b30000; border-top: 6px solid #b30000; 
+            box-shadow: 0 20px 45px rgba(0,0,0,0.2); margin-bottom: 50px; line-height: 1.8; font-size: 1.1em;
+        }
+
+        .clamp-text { text-align: justify; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: 0.3s ease; }
         .clamp-text.expanded { -webkit-line-clamp: unset; }
-        .read-more-btn { display: inline-block; color: #0b5fb3; font-size: 1.1em; font-weight: bold; font-style: italic; cursor: pointer; margin-bottom: 20px; transition: 0.3s; margin-left: 5px; }
-        .read-more-btn:hover { color: #b30000; text-decoration: underline; }
+        .read-more-btn { display: inline-block; color: #b30000; font-size: 1em; font-weight: bold; font-style: italic; cursor: pointer; margin-bottom: 20px; transition: 0.3s; margin-left: 5px; border-bottom: 1px dashed #b30000;}
+        .read-more-btn:hover { color: #ffcc00; border-color: #ffcc00; }
 
-        .article-block h3 { color: #b30000; font-size: 1.8em; margin: 40px 0 15px 0; border-left: 5px solid #ffcc00; padding-left: 15px; }
-        .article-block ul { padding-left: 40px; font-size: 1.25em; line-height: 1.8; margin-bottom: 20px;}
-        .article-block blockquote { background: rgba(0,0,0,0.05); padding: 20px; border-left: 5px solid #b30000; font-style: italic; font-size: 1.3em; margin: 20px 0; border-radius: 0 10px 10px 0; }
+        .article-block h3 { color: #b30000; font-size: 1.8em; margin: 40px 0 15px 0; border-left: 6px solid #ffcc00; padding-left: 15px; font-family: 'Playfair Display', serif;}
+        .article-block ul { padding-left: 40px; font-size: 1.1em; line-height: 1.8; margin-bottom: 20px;}
+        .article-block blockquote { background: rgba(0,0,0,0.04); padding: 25px; border-left: 5px solid #b30000; font-style: italic; font-size: 1.25em; margin: 20px 0; border-radius: 0 10px 10px 0; }
 
-        /* ẢNH TƯ LIỆU VÀ CHÚ THÍCH */
-        figure.img-box { text-align: center; margin: 40px 0; display: flex; flex-direction: column; align-items: center; }
-        figure.img-box img { width: 100%; max-width: 600px; aspect-ratio: 600/400; object-fit: cover; border-radius: 10px; border: 2px solid #b30000; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); transition: 0.4s; cursor: pointer; }
-        figure.img-box img:hover { transform: scale(1.02); }
-        figure.img-box figcaption { font-style: italic; color: #333; margin-top: 15px; font-size: 1.15em; padding: 0 20px; font-weight: 500; }
+        figure.img-box { text-align: center; margin: 45px 0; display: flex; flex-direction: column; align-items: center; }
+        figure.img-box img { width: 100%; max-width: 650px; aspect-ratio: 600/400; object-fit: cover; border-radius: 12px; border: 3px solid #b30000; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); transition: 0.4s; cursor: pointer; }
+        figure.img-box img:hover { transform: scale(1.02); box-shadow: 0 15px 35px rgba(179, 0, 0, 0.3); }
+        figure.img-box figcaption { font-style: italic; color: #444; margin-top: 15px; font-size: 1.05em; padding: 0 20px; font-weight: 500; }
         figure.img-box figcaption strong { color: #b30000; }
 
-        /* THẺ CARD KẾT QUẢ Ý NGHĨA */
-        .meaning-card { display: flex; align-items: center; background: rgba(255,255,255,0.95); margin: 40px auto; border-radius: 18px; border: 4px solid #b30000; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.4s; }
-        .meaning-card:hover { transform: translateY(-10px); }
-        .meaning-card img { width: 40%; height: 350px; object-fit: cover; border: none; cursor: pointer;}
-        .meaning-card .meaning-text { width: 60%; padding: 30px; }
-        .meaning-card h3 { color: #b30000; font-size: 1.8em; margin-bottom: 15px; }
+        .meaning-card { display: flex; align-items: center; background: rgba(255,255,255,0.97); margin: 40px auto; border-radius: 18px; border: 2px solid #b30000; border-left: 8px solid #b30000; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2); transition: 0.4s; }
+        .meaning-card:hover { transform: translateY(-8px); }
+        .meaning-card img { width: 45%; height: 350px; object-fit: cover; border: none; cursor: pointer;}
+        .meaning-card .meaning-text { width: 55%; padding: 35px; }
+        .meaning-card h3 { color: #b30000; font-size: 2em; margin-bottom: 15px; font-family: 'Playfair Display', serif;}
 
-        /* GRID VÀ VIDEO */
         .document-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
-        .video-container { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 40px; padding: 30px 10px; background: rgba(255,255,255,0.95); border-radius: 15px; border: 3px dashed #b30000; }
+        .video-container { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 40px; padding: 35px 15px; background: rgba(255,255,255,0.97); border-radius: 15px; border: 2px dashed #b30000; }
         .video-item { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 420px; }
-        .video-item video { width: 100%; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 3px solid #b30000; }
-        .video-item p { margin-top: 20px; font-weight: bold; color: #b30000; font-size: 1.4em; text-transform: uppercase; }
+        .video-item video { width: 100%; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.25); border: 3px solid #b30000; }
+        .video-item p { margin-top: 20px; font-weight: bold; color: #b30000; font-size: 1.3em; text-transform: uppercase; }
 
-        .youtube-links { margin-top: 20px; padding: 20px; background: #f9f9f9; border-left: 5px solid #b30000; border-radius: 5px; border: 1px solid #ddd; }
-        .youtube-links h4 { color: #b30000; font-size: 1.4em; margin-bottom: 15px; }
-        .youtube-links a { display: block; color: #0b5fb3; font-size: 1.2em; font-weight: bold; margin-bottom: 10px; text-decoration: none; }
-        
         .books-list { list-style: none; padding: 0; }
-        .books-list li { display: flex; gap: 20px; background: #fff; margin-bottom: 20px; padding: 20px; border-radius: 10px; border: 3px solid #b30000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s; align-items: flex-start; }
-        .books-list li:hover { transform: translateX(5px); }
-        .books-list img { width: 120px; height: auto; border-radius: 5px; border: none; cursor: pointer;}
-        .books-list h4 { color: #b30000; font-size: 1.4em; margin-bottom: 10px; }
+        .books-list li { display: flex; gap: 25px; background: #fff; margin-bottom: 25px; padding: 25px; border-radius: 12px; border: 2px solid #eee; border-left: 6px solid #b30000; box-shadow: 0 8px 20px rgba(0,0,0,0.08); transition: 0.3s; align-items: flex-start; }
+        .books-list li:hover { transform: translateX(8px); box-shadow: 0 12px 30px rgba(0,0,0,0.15);}
+        .books-list img { width: 130px; height: auto; border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer;}
+        .books-list h4 { color: #b30000; font-size: 1.5em; margin-bottom: 10px; font-family: 'Playfair Display', serif; }
 
-        /* ==================================================================
-           5. CSS KHU VỰC THÀNH VIÊN NHÓM (GIAO DIỆN INDEX - DỮ LIỆU NHÓM 3)
-           ================================================================== */
-        .task-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-        }
-
-        .member-card {
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            position: relative;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            cursor: pointer;
-            overflow: hidden;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin-bottom: 0;
-        }
-
-        .member-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 30px;
-            padding: 2px;
-            background: linear-gradient(135deg, transparent 40%, var(--gold), transparent 60%);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: 0.5s;
-        }
-
-        .member-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-
-        .member-card:hover::after { opacity: 1; }
-
-        .card-header {
-            padding: 30px;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            background: transparent;
-        }
-
-        .card-header .avatar {
-            width: 90px; 
-            height: 90px;
-            border-radius: 50%;
-            border: 3px solid var(--gold);
-            object-fit: cover;
-            transition: 0.6s;
-            box-shadow: 0 0 15px rgba(0,0,0,0.4);
-            flex-shrink: 0;
-            margin-right: 0;
-        }
-
-        .member-card:hover .avatar {
-            transform: rotate(8deg) scale(1.1);
-            box-shadow: 0 0 30px var(--gold-glow);
-            border-color: white;
-        }
-
+        /* ==================== THÀNH VIÊN ==================== */
+        .task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; }
+        .member-card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 25px; position: relative; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; overflow: hidden; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.25); margin-bottom: 0; }
+        .member-card:hover { transform: translateY(-12px) scale(1.02); background: rgba(255, 255, 255, 0.12); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .card-header { padding: 30px; display: flex; align-items: center; gap: 30px; background: transparent; }
+        .card-header .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; transition: 0.6s; box-shadow: 0 0 15px rgba(0,0,0,0.4); flex-shrink: 0; margin-right: 0; }
+        .member-card:hover .avatar { transform: rotate(8deg) scale(1.1); box-shadow: 0 0 30px var(--gold-glow); border-color: white; }
         .card-header .info { display: flex; flex-direction: column; }
-        
-        .card-header .name { 
-            font-weight: 900; 
-            color: var(--gold); 
-            font-size: 1.5rem; 
-            margin-bottom: 6px;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
-        }
-
-        .card-header .short-task { 
-            font-size: 14px; 
-            color: #eee; 
-            background: rgba(240, 198, 129, 0.15);
-            padding: 4px 12px;
-            border-radius: 20px;
-            display: inline-block;
-            font-weight: bold;
-            font-style: normal;
-        }
-
-        .card-content {
-            max-height: 0;
-            opacity: 0;
-            padding: 0 30px;
-            transition: all 0.5s ease-in-out;
-            overflow: hidden;
-            border: none;
-        }
-
-        .member-card.open .card-content {
-            max-height: 300px;
-            padding: 25px 30px 30px 30px;
-            opacity: 1;
-            border-top: 1px solid var(--glass-border);
-        }
-
+        .card-header .name { font-weight: 900; color: var(--gold); font-size: 1.5rem; margin-bottom: 6px; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); }
+        .card-header .short-task { font-size: 14px; color: #eee; background: rgba(240, 198, 129, 0.2); padding: 5px 15px; border-radius: 20px; display: inline-block; font-weight: bold; font-style: normal; }
+        .card-content { max-height: 0; opacity: 0; padding: 0 30px; transition: all 0.5s ease-in-out; overflow: hidden; border: none; }
+        .member-card.open .card-content { max-height: 300px; padding: 25px 30px 30px 30px; opacity: 1; border-top: 1px solid var(--glass-border); }
         .card-content ul { padding: 0; margin: 0; list-style: none; }
-        .card-content li { 
-            font-size: 15px; 
-            margin-bottom: 12px; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-            color: #ddd;
-        }
-
+        .card-content li { font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; color: #ddd; }
         .card-content li i { color: var(--gold); font-size: 14px; width: 20px; text-align: center; }
 
-        body.dark-mode #thanh-vien .member-card { background: var(--glass); border: 1px solid var(--glass-border); }
-        body.dark-mode #thanh-vien .member-card .name { color: var(--gold); }
-
-        /* ==================================================================
-           6. CSS GIAO DIỆN BÌNH LUẬN TRÊN WEB
-           ================================================================== */
-        .comment-form-box { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #ccc; }
-        .comment-form-box input, .comment-form-box textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc; border-radius: 8px; font-size: 1.1em; font-family: inherit; transition: 0.3s; }
-        .comment-form-box input:focus, .comment-form-box textarea:focus { border-color: #b30000; outline: none; }
-        .comment-form-box button { background: #b30000; color: #fff; border: none; padding: 12px 25px; font-size: 1.2em; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-family: 'Oswald', sans-serif;}
-        .comment-form-box button:hover { background: #fc0; color: #b30000; }
-
-        .comment-item { background: #fff; border: 2px solid #b30000; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-        .comment-header-box { display: flex; align-items: flex-start; border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; }
-        .comment-avatar { width: 50px; height: 50px; background: #b30000; color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2em; margin-right: 15px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer;}
+        /* ==================== BÌNH LUẬN & INPUT ==================== */
+        .comment-form-box { margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px dashed #ddd; }
+        input[type="text"], input[type="email"], textarea { width: 100%; padding: 15px 20px; margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1.05em; font-family: inherit; background-color: #fafafa; transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus { border-color: #b30000; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(179, 0, 0, 0.1); outline: none; }
+        .comment-form-box button, .modal-content button { background: #b30000; color: #fff; border: none; padding: 14px 35px; font-size: 1.15em; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-family: 'Oswald', sans-serif; box-shadow: 0 5px 15px rgba(179, 0, 0, 0.3); }
+        .comment-form-box button:hover, .modal-content button:hover { background: #fc0; color: #b30000; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 204, 0, 0.4);}
+        .comment-item { background: #fff; border: 1px solid #eee; border-left: 5px solid #b30000; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .comment-header-box { display: flex; align-items: center; margin-bottom: 15px; }
+        .comment-avatar { width: 55px; height: 55px; background: linear-gradient(135deg, #b30000, #ff4d4d); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.3em; margin-right: 15px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(179,0,0,0.3);}
         .comment-info-box { display: flex; flex-direction: column; }
-        .comment-name { color: #b30000; font-weight: bold; font-size: 1.2em; }
-        .comment-date { color: #888; font-size: 0.9em; font-style: italic; margin-top: 5px;}
-        .comment-content-box { font-size: 1.15em; color: #333; line-height: 1.6; }
+        .comment-name { color: #b30000; font-weight: bold; font-size: 1.25em; }
+        .comment-date { color: #888; font-size: 0.9em; font-style: italic; margin-top: 3px;}
+        .comment-content-box { font-size: 1.1em; color: #333; line-height: 1.6; }
 
-        /* ==================================================================
-           7. FOOTER VÕ ĐỨC HÙNG (NỀN ĐỎ)
-           ================================================================== */
-        footer { 
-            background: #b30000; color: #fff; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; height: 50vh; 
-            text-align: center; padding: 20px; z-index: 10; border-top: 5px solid #fc0; 
-        }
-        footer h2 { font-family: 'Montserrat', sans-serif; color: #fc0; font-size: 2.5em; margin-bottom: 10px; text-transform: uppercase;}
-        footer p { font-size: 1.4em; margin-bottom: 5px; color: #fff; }
-        footer .author { font-family: 'Oswald', sans-serif; font-size: 4em; font-weight: bold; color: #fc0; margin: 15px 0; letter-spacing: 2px;}
-        footer .contact-box { background: rgba(0,0,0,0.2); padding: 15px 30px; border-radius: 10px; border: 2px dashed #fc0; font-size: 1.3em; line-height: 1.8;}
-
-        /* CSS TỐI */
-        body.dark-mode .wrapper { background-color: rgba(18,18,18,0.9); }
-        body.dark-mode .article-block, body.dark-mode .meaning-card, body.dark-mode .comment-item, body.dark-mode .books-list li { background: #222; color: #eee; border-color: #f44; }
-        body.dark-mode section h2.main-title { color: #f44; background: #222; border-color: #f44; text-shadow: none; }
-        body.dark-mode .article-block h3, body.dark-mode .meaning-card h3, body.dark-mode .comment-name { color: #ff6666; }
-        body.dark-mode .comment-content-box { color: #eee; }
-        body.dark-mode .comment-header-box { border-color: #444; }
-        body.dark-mode .modal-content { background: #222; }
-        body.dark-mode .modal-content input, body.dark-mode .modal-content textarea { background: #333; color: #fff; border-color: #555; }
-        body.dark-mode .comment-form-box input, body.dark-mode .comment-form-box textarea { background: #333; color: #fff; border-color: #555; }
-
-        /* ==================================================================
-           8. NÚT LƠ LỬNG VÀ POPUP GÓP Ý EMAIL
-           ================================================================== */
-        #ghost-trigger { position: fixed; bottom: 30px; right: 30px; width: 80px; height: 80px; z-index: 9999; cursor: pointer; transition: 0.3s; background: #fff; border-radius: 50%; border: 3px solid #b30000; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        /* ==================== NÚT NỔI & MODAL ==================== */
+        #ghost-trigger { position: fixed; bottom: 30px; right: 30px; width: 75px; height: 75px; z-index: 9999; cursor: pointer; transition: 0.3s; background: #fff; border-radius: 50%; border: 3px solid #b30000; box-shadow: 0 8px 25px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; overflow: hidden; }
         #ghost-trigger:hover { transform: scale(1.1); }
         .bot-logo { width: 100%; height: 100%; object-fit: cover; }
-
-        #feedback-btn { position: fixed; bottom: 30px; left: 30px; background: #b30000; color: #fc0; padding: 15px 25px; border-radius: 30px; font-size: 1.2em; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: 2px solid #fc0; transition: 0.3s; display: flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif;}
-        #feedback-btn:hover { background: #fc0; color: #b30000; transform: scale(1.05); border-color: #b30000; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        #feedback-btn { position: fixed; bottom: 30px; left: 30px; background: #b30000; color: #fc0; padding: 12px 25px; border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 2px solid #fc0; transition: 0.3s; display: flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif;}
+        #feedback-btn:hover { background: #fc0; color: #b30000; transform: scale(1.05) translateY(-3px); border-color: #b30000; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-content { background: #fff; width: 90%; max-width: 500px; padding: 30px; border-radius: 15px; border: 4px solid #b30000; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-content h3 { color: #b30000; text-align: center; font-size: 1.8em; margin-bottom: 20px; border-bottom: 2px dashed #fc0; padding-bottom: 10px; }
-        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc; border-radius: 8px; font-size: 1.1em; font-family: inherit;}
-        .modal-content button { width: 100%; background: #b30000; color: #fc0; font-weight: bold; font-size: 1.2em; padding: 15px; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-family: 'Oswald', sans-serif;}
-        .modal-content button:hover { background: #fc0; color: #b30000; }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 2em; color: #b30000; cursor: pointer; font-weight: bold; }
-        .close-modal:hover { color: #f00; }
+        .modal-content { background: #fff; width: 90%; max-width: 500px; padding: 40px; border-radius: 16px; border: 5px solid #b30000; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .modal-content h3 { color: #b30000; text-align: center; font-size: 1.8em; margin-bottom: 25px; border-bottom: 2px dashed #fc0; padding-bottom: 15px; font-family: 'Playfair Display', serif; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2.2em; color: #bbb; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        .close-modal:hover { color: #b30000; }
 
-        /* ==================================================================
-           9. PRELOADER VÀ VIDEO CHẠM ĐÁY
-           ================================================================== */
+        /* ==================== PRELOADER & VIDEO ==================== */
         #preloader { position: fixed; inset: 0; background: #fff; z-index: 999999; display: flex; justify-content: center; align-items: center; transition: 1s; }
         .animation-window { position: relative; width: 600px; height: 400px; border: 5px solid #000; border-radius: 10px; background: #fff; overflow: hidden; display: flex; align-items: center; }
         .gate-area { position: absolute; left: 20%; height: 80%; display: flex; align-items: center; z-index: 5; }
@@ -315,7 +235,6 @@
         #close-video-btn { position: absolute; top: 25px; right: 35px; z-index: 9999; background: rgba(0,0,0,0.6); color: #fff; border: 2px solid #fff; padding: 10px 25px; font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         #close-video-btn:hover { background: #f00; border-color: #f00; }
 
-        @media (max-width: 900px) { .task-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .document-grid { grid-template-columns: 1fr; }
             .meaning-card { flex-direction: column; }
@@ -325,11 +244,81 @@
             .card-header .avatar { width: 75px; height: 75px; }
             .member-card.open .card-content { padding-left: 30px; }
             .card-header { gap: 20px; }
-            footer h2 { font-size: 1.8em; }
-            footer .author { font-size: 2.8em; }
             #feedback-btn { font-size: 1em; padding: 10px 15px; bottom: 20px; left: 20px; }
             #ghost-trigger { width: 60px; height: 60px; bottom: 20px; right: 20px;}
         }
+
+        /* ==================== CHATBOT ==================== */
+        #chatbot-modal {
+            position: fixed; bottom: 120px; right: 30px; z-index: 100000; display: none; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3); border-radius: 16px; overflow: hidden;
+            animation: slideUpChat 0.3s ease forwards; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        #chatbot-modal.active { display: block; }
+        @keyframes slideUpChat { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        #chatbot-modal .chat-container { width: 360px; height: 520px; background-color: #ffffff; display: flex; flex-direction: column; }
+        #chatbot-modal .chat-header { background: linear-gradient(135deg, #b30000, #ff4d4d); padding: 15px 20px; display: flex; align-items: center; color: white;}
+        #chatbot-modal .header-avatar { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; margin-right: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #chatbot-modal .header-info { flex: 1; }
+        #chatbot-modal .header-info h3 { margin: 0; font-size: 16px; color: white; font-weight: 600; text-transform: none; background: none; border: none; padding: 0; box-shadow: none; left: auto; transform: none;}
+        #chatbot-modal .header-info p { margin: 2px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.9); }
+        #close-chat-btn { background: transparent; border: none; font-size: 18px; cursor: pointer; color: white; padding: 5px; transition: 0.2s;}
+        #close-chat-btn:hover { transform: scale(1.1); }
+        #chatbot-modal .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-color: #f8f9fa; }
+        #chatbot-modal .chat-box::-webkit-scrollbar { width: 5px; }
+        #chatbot-modal .chat-box::-webkit-scrollbar-thumb { background-color: #dcdde1; border-radius: 10px; }
+        #chatbot-modal .message-wrapper { display: flex; flex-direction: column; animation: slideUpChat 0.2s ease forwards; }
+        #chatbot-modal .message { max-width: 82%; padding: 12px 16px; font-size: 14.5px; line-height: 1.4; word-wrap: break-word; }
+        #chatbot-modal .bot-wrapper { align-items: flex-start; }
+        #chatbot-modal .bot-message { background-color: #ffffff; color: #1d1d1d; border-radius: 18px 18px 18px 4px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        #chatbot-modal .user-wrapper { align-items: flex-end; }
+        #chatbot-modal .user-message { background-color: #b30000; color: #ffffff; border-radius: 18px 18px 4px 18px; box-shadow: 0 2px 5px rgba(179,0,0,0.2);}
+        #chatbot-modal .chat-input-area { padding: 12px 15px; background-color: #ffffff; display: flex; align-items: center; border-top: 1px solid #eee; }
+        #chatbot-modal .input-wrapper { flex: 1; background-color: #f0f2f5; border-radius: 20px; display: flex; align-items: center; padding: 6px 15px; }
+        #chatbot-modal #user-input { flex: 1; border: none; background: transparent; padding: 5px 0; outline: none; font-size: 14.5px; font-family: inherit; color: #050505; }
+        #chatbot-modal #send-btn { background: transparent; color: #b30000; border: none; width: 40px; height: 40px; margin-left: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; padding: 0;}
+        #chatbot-modal #send-btn:hover { transform: scale(1.1); }
+        #chatbot-modal .send-icon { width: 22px; height: 22px; fill: currentColor; }
+
+        /* ==================== BẢN ĐỒ DU LỊCH 3D ==================== */
+        #tour-trigger {
+            position: fixed; bottom: 90px; left: 30px;
+            width: 90px; height: 90px;
+            z-index: 9999; cursor: pointer; transition: 0.3s;
+            border-radius: 50%; border: 4px solid #00e5ff;
+            box-shadow: 0 8px 25px rgba(0, 229, 255, 0.4);
+            overflow: hidden; background: #fff;
+        }
+        #tour-trigger:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 10px 30px rgba(0, 229, 255, 0.6); }
+        .tour-logo { width: 100%; height: 100%; object-fit: cover; }
+
+        #map-overlay { position: fixed; inset: 0; background: #000; z-index: 100005; display: none; opacity: 0; transition: opacity 0.5s ease; }
+        #map-overlay.active { display: block; opacity: 1; }
+        #close-map-btn { position: absolute; top: 20px; right: 20px; z-index: 100006; background: rgba(179,0,0,0.9); color: #fff; border: 2px solid #fc0; padding: 10px 25px; font-weight: bold; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        #close-map-btn:hover { background: #fc0; color: #b30000; transform: scale(1.05); }
+        #map-container { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #map-menu-panel { position: absolute; top: 20px; left: 20px; z-index: 100006; background: rgba(10, 10, 15, 0.85); color: white; padding: 20px; border-radius: 12px; border: 1px solid #00e5ff; width: 280px; box-shadow: 0 8px 30px rgba(0, 229, 255, 0.2); backdrop-filter: blur(5px); }
+        #map-menu-panel h3 { margin-top: 0; color: #00e5ff; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 10px; text-transform: uppercase; }
+        .map-loc-btn { display: block; width: 100%; text-align: left; padding: 12px 12px; margin-bottom: 8px; border: none; background: rgba(255, 255, 255, 0.05); color: #ddd; border-radius: 6px; cursor: pointer; transition: 0.3s; font-size: 14px; font-weight: bold; }
+        .map-loc-btn:hover { background: rgba(0, 229, 255, 0.2); color: white; }
+        .map-loc-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .map-loc-btn.active { background: #00e5ff; color: black; box-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+        #plane-icon { width: 44px; height: 44px; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg' fill='white' stroke='%23000' stroke-width='6'%3E%3Cpath d='M256,16 C265,16 273,23 273,32 L273,180 L460,330 L460,380 L273,310 L273,430 L320,470 L320,496 L256,480 L192,496 L192,470 L239,430 L239,310 L52,380 L52,330 L239,180 L239,32 C239,23 247,16 256,16 Z'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; background-position: center; filter: drop-shadow(0px 12px 10px rgba(0,0,0,0.7)); transform-origin: center center; z-index: 5; }
+        .custom-pin-marker { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
+        .custom-pin-icon { width: 28px; height: 28px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff3333' stroke='white' stroke-width='1.5'%3E%3Cpath d='M12 0C5.373 0 0 5.373 0 12c0 8.04 7.6 15.3 10.8 18.1.35.31.85.31 1.2 0C16.4 27.3 24 20.04 24 12c0-6.627-5.373-12-12-12zm0 17a5 5 0 110-10 5 5 0 010 10z'/%3E%3C/svg%3E"); background-size: cover; filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.6));  }
+        .custom-pin-label { margin-top: -35px; margin-bottom: 5px; font-size: 13px; font-weight: bold; color: #fff; background: rgba(0, 0, 0, 0.8); border: 1px solid #ff3333; border-radius: 6px; padding: 4px 8px; white-space: nowrap; }
+
+        /* CSS TỐI */
+        body.dark-mode .wrapper { background-color: rgba(18,18,18,0.9); }
+        body.dark-mode .article-block, body.dark-mode .meaning-card, body.dark-mode .comment-item, body.dark-mode .books-list li { background: #222; color: #eee; border-color: #f44; }
+        body.dark-mode section h2.main-title { color: #f44; background: #222; border-color: #f44; text-shadow: none; }
+        body.dark-mode .article-block h3, body.dark-mode .meaning-card h3, body.dark-mode .comment-name { color: #ff6666; }
+        body.dark-mode .comment-content-box { color: #eee; }
+        body.dark-mode .comment-header-box { border-color: #444; }
+        body.dark-mode .modal-content { background: #222; border-color: #f44;}
+        body.dark-mode .modal-content input, body.dark-mode .modal-content textarea { background: #333; color: #fff; border-color: #555; }
+        body.dark-mode .comment-form-box input, body.dark-mode .comment-form-box textarea { background: #333; color: #fff; border-color: #555; }
     </style>
 </head>
 
@@ -354,7 +343,7 @@
                 <img src="logo1.png" alt="Logo" class="logo">
                 <h1 class="brand-name">TOÀN THẮNG</h1>
             </div>
-            <div class="slogan">
+           <div class="slogan">
                 <span class="txt t1">Dưới</span><span class="txt t2">xe</span><span class="txt t3">chân</span><span class="txt t4">là</span>
                 <span class="txt t5">tăng</span><span class="txt t6">quá</span><span class="txt t7">khứ,</span><span class="txt t8">trước</span>
                 <span class="txt t9">mũi</span><span class="txt t10">súng</span><span class="txt t11">là</span><span class="txt t12">hoà</span><span class="txt t13">bình"</span>
@@ -363,9 +352,8 @@
 
         <nav class="red-nav">
             <ul class="main-menu">
-                <li class="has-submenu main-menu-btn"><a href="#">☰</a>
+                <li class="has-submenu main-menu-btn"><a href="#">☰ Tùy Chọn</a>
                     <ul class="submenu">
-                        <li><a href="#">Search 🔍</a></li>
                         <li><a href="#" onclick="toggleTheme(); return false;" id="mode-text">☀️ Sáng/Tối</a></li>
                         <li><a href="#">🏠 Trang chủ</a></li>
                     </ul>
@@ -548,7 +536,7 @@
                         <p class="clamp-text">Bài học ấy đến nay vẫn còn nguyên giá trị. Trong bối cảnh toàn cầu hóa cùng nhiều thách thức mới như biến đổi khí hậu, dịch bệnh hay cạnh tranh kinh tế, tinh thần đoàn kết giữa các tầng lớp xã hội, các vùng miền và các cộng đồng vẫn là yếu tố then chốt giúp Việt Nam phát triển bền vững. Đoàn kết không chỉ là sự gắn bó về tinh thần mà còn là sự hợp tác hiệu quả, tôn trọng sự đa dạng và cùng nhau hướng tới lợi ích chung của đất nước.</p>
 
                         <h3>Nghệ thuật quân sự độc đáo và sự chỉ huy dũng cảm</h3>
-                        <p class="clamp-text">Bài học thứ hai là bài học về sự chỉ huy dũng cảm và thao lược. Cuộc Tổng tiến công và nổi dậy mùa Xuân năm 1975 đã thể hiện rõ tài lãnh đạo sáng suốt, tầm nhìn chiến lược và nghệ thuật chỉ huy tài tình của Bộ Chính trị và Quân ủy Trung ương. Nhờ biết nắm bắt đúng thời cơ và tổ chức các đòn tiến công táo bạo, quyết đoán, quân và dân ta đã nhanh chóng giải phóng miền Nam, hoàn thành sự nghiệp thống nhất đất nước.</p>
+                        <p class="clamp-text">Bài học thứ hai là bài học về sự chỉ huy dũng cảm và thao lược. Cuộc Tổng tiến công và nổi dậy mùa Xuân năm 1975 đã thể hiện rõ tài lãnh đạo sáng suốt, tầm nhìn chiến lược và nghệ thuật chỉ huy tài tình của Bộ Chính trị và Quân ủy Trung ương. Nhờ biết nắm bắt đúng thời cơ và tổ chức các đòn tiến công táo bạo, quyết đoán, quân và dân্থta đã nhanh chóng giải phóng miền Nam, hoàn thành sự nghiệp thống nhất đất nước.</p>
                         
                         <h3>Trang sử vàng không thể quên</h3>
                         <p class="clamp-text">Cách đây 50 năm, vào mùa Xuân năm 1975, toàn dân tộc ta đã làm làm nên một chiến công chói lọi trong lịch sử – cuộc Tổng tiến công và nổi dậy vĩ đại mà đỉnh cao là Chiến dịch Hồ Chí Minh lịch sử. Ngày 30/4/1975 đã khắc sâu vào tâm khảm triệu triệu người con đất Việt như một mốc son huy hoàng, mở ra kỷ nguyên mới – kỷ nguyên độc lập, tự do, thống nhất non sông, đưa đất nước vững bước trên con đường xây dựng chủ nghĩa xã hội. Cuộc chiến khốc liệt trong lịch sử dân tộc đã đi qua nhưng những nỗi đau, mất mát vẫn còn đó… Với những người trẻ hiện đại, ngày 30/4 là một dấu mốc quan trọng không thể quên, là bài học xương máu để họ nỗ lực, cống hiến hết mình cho sự phát triển trường tồn của dân tộc.</p>
@@ -905,18 +893,18 @@
                         </div>
                         
                        <div class="team-contact" style="text-align: center; margin-top: 40px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 2px dashed var(--gold);">
-    <p style="font-size: 1.5em; color: var(--gold); font-weight: bold; margin: 10px 0; font-family: 'Oswald', sans-serif;">THÔNG TIN LIÊN HỆ: Nhóm 1 Tin Học lớp 12A1</p>
-    <p style="font-size: 1.1em; color: #ddd; margin-bottom: 5px;">
-        <i class="fab fa-facebook" style="color: #1877f2;"></i> Facebook: <a href="https://www.facebook.com/share/1GoJJrLLgj/" target="_blank" style="color: #00aaff; text-decoration: none;">Võ Đức Hùng</a> | 
-        <i class="fas fa-phone-alt" style="color: #25d366;"></i> Zalo: 0384 535 921
-    </p>
-    <p style="font-size: 1.1em; color: #ddd;">EMAIL: duchungvo793@gmail.com</p>
-</div>
+                            <p style="font-size: 1.5em; color: var(--gold); font-weight: bold; margin: 10px 0; font-family: 'Oswald', sans-serif;">THÔNG TIN LIÊN HỆ: Nhóm 1 Tin Học lớp 12A1</p>
+                            <p style="font-size: 1.1em; color: #ddd; margin-bottom: 5px;">
+                                <i class="fab fa-facebook" style="color: #1877f2;"></i> Facebook: <a href="https://www.facebook.com/share/1GoJJrLLgj/" target="_blank" style="color: #00aaff; text-decoration: none;">Võ Đức Hùng</a> | 
+                                <i class="fas fa-phone-alt" style="color: #25d366;"></i> Zalo: 0384 535 921
+                            </p>
+                            <p style="font-size: 1.1em; color: #ddd;">EMAIL: duchungvo793@gmail.com</p>
+                        </div>
                     </div>
                 </section>
 
                 <section id="khu-vuc-binh-luan">
-                    <h2 class="main-title">BÌNH LUẬN CỦA BẠN ĐỌC</h2>
+                    <h2 class="main-title">BÌNH LUẬN CỦA BẠN</h2>
                     <div class="article-block">
                         
                         <div class="comment-form-box">
@@ -935,17 +923,6 @@
             </div>
         </main>
 
-        <footer id="footer-lien-he">
-    <h2>Bản hùng ca Đại thắng Mùa Xuân 1975</h2>
-    <p>Trang thông tin lịch sử được nghiên cứu và phát triển bởi</p>
-    <div class="author">Nhóm 1 lớp 12A1</div>
-    <div class="contact-box">
-        <p><i class="fas fa-phone-alt"></i> <span>Zalo:</span> 0384 535 921</p>
-        <p><i class="fab fa-facebook"></i> <span>Facebook:</span> <a href="https://www.facebook.com/share/1GoJJrLLgj/" target="_blank" style="color: #fc0; text-decoration: none;">Kết nối với chúng tôi</a></p>
-        <p><i class="fas fa-envelope"></i> <span>Email:</span> duchungvo793@gmail.com</p>
-    </div>
-</footer>
-
         <div id="video-finale-overlay" class="video-overlay">
             <button id="close-video-btn">✖ Đóng Video</button>
             <video id="finale-video" src="ket.mp4" controls preload="auto"></video>
@@ -953,6 +930,51 @@
 
         <div id="ghost-trigger" onclick="toggleGemini()">
             <img src="chat.png" alt="VN-Chatbot" class="bot-logo">
+        </div>
+
+        <div id="chatbot-modal">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="header-avatar">✨</div>
+                    <div class="header-info">
+                        <h3>Trợ lý thông minh</h3>
+                        <p>Đang hoạt động</p>
+                    </div>
+                    <button id="close-chat-btn" onclick="toggleGemini()">✖</button>
+                </div>
+                
+                <div class="chat-box" id="chat-box">
+                    <div class="message-wrapper bot-wrapper">
+                        <div class="message bot-message">
+                            Chào bạn! Mình có thể giúp gì cho bạn hôm nay?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <input type="text" id="user-input" placeholder="Aa" onkeypress="handleKeyPress(event)">
+                    </div>
+                    <button id="send-btn" onclick="sendMessage()">
+                        <svg class="send-icon" viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tour-trigger" onclick="openTourMap()" title="Mở Bản Đồ Hành Trình">
+            <img src="dulich.jpg" alt="Du Lịch" class="tour-logo">
+        </div>
+
+        <div id="map-overlay">
+            <button id="close-map-btn" onclick="closeTourMap()">✖ Đóng Bản Đồ</button>
+            <div id="map-menu-panel">
+                <h3>🌍 Hành Trình Di Tích</h3>
+                <div id="map-button-list"></div>
+            </div>
+            <div id="map-container"></div>
         </div>
 
         <div id="feedback-btn" onclick="openFeedbackModal()">
@@ -975,63 +997,38 @@
         </div>
     </div>
 <script>
-    // HIỆU ỨNG PHÁO HOA KHI NHẤP CHUỘT Ở BẤT CỨ ĐÂU TRÊN TRANG
         document.addEventListener("DOMContentLoaded", function() {
             document.addEventListener('click', function(e) {
                 var x = e.clientX / window.innerWidth;
                 var y = e.clientY / window.innerHeight;
-                confetti({ 
-                    particleCount: 150, 
-                    spread: 80, 
-                    origin: { x: x, y: y }, 
-                    colors: ['#b30000', '#ffcc00', '#ffffff', '#0b5fb3'], 
-                    zIndex: 999999 
-                });
+                confetti({ particleCount: 150, spread: 80, origin: { x: x, y: y }, colors: ['#b30000', '#ffcc00', '#ffffff', '#0b5fb3'], zIndex: 999999 });
             });
         });
 
-        // HÀM LẤY CHỮ CÁI ĐẦU LÀM AVATAR
         function getInitials(name) {
             var parts = name.trim().split(' ');
             if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
             return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
         }
 
-        // HÀM LẬT THẺ THÀNH VIÊN
         function toggleCard(el) {
             var allCards = document.querySelectorAll('.member-card');
             allCards.forEach(function(card) { if (card !== el) card.classList.remove('open'); });
             el.classList.toggle('open');
         }
 
-        // ===============================================================
-        // CHỨC NĂNG BÌNH LUẬN TRỰC TIẾP TRÊN WEB (LOCALSTORAGE)
-        // ===============================================================
         function loadComments() {
             var container = document.getElementById('dynamic-comments');
-            // DÙNG TÊN MỚI ĐỂ ĐẢM BẢO XÓA SẠCH BÌNH LUẬN MẪU CŨ CỦA TRÌNH DUYỆT
             var comments = JSON.parse(localStorage.getItem('webComments_moitinh')) || [];
-            
             container.innerHTML = '';
-            
             if(comments.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #888; font-style: italic; font-size: 1.2em; padding: 20px;">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>';
                 return;
             }
-
             comments.forEach(function(cmt) {
                 var initials = getInitials(cmt.name);
                 container.innerHTML += 
-                    '<div class="comment-item">' +
-                        '<div class="comment-header-box">' +
-                            '<div class="comment-avatar">' + initials + '</div>' +
-                            '<div class="comment-info-box">' +
-                                '<span class="comment-name">' + cmt.name + '</span>' +
-                                '<span class="comment-date">' + cmt.date + '</span>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="comment-content-box">' + cmt.text + '</div>' +
-                    '</div>';
+                    '<div class="comment-item"><div class="comment-header-box"><div class="comment-avatar">' + initials + '</div><div class="comment-info-box"><span class="comment-name">' + cmt.name + '</span><span class="comment-date">' + cmt.date + '</span></div></div><div class="comment-content-box">' + cmt.text + '</div></div>';
             });
         }
 
@@ -1040,27 +1037,19 @@
             var btn = document.getElementById('webCmtBtn');
             var name = document.getElementById('webName').value.trim();
             var text = document.getElementById('webText').value.trim();
-
             btn.innerText = "ĐANG LƯU..."; btn.disabled = true;
-
             var today = new Date();
             var dateStr = ("0" + today.getDate()).slice(-2) + "/" + ("0" + (today.getMonth() + 1)).slice(-2) + "/" + today.getFullYear();
             var newCmt = { name: name, date: dateStr, text: text };
-            
             var comments = JSON.parse(localStorage.getItem('webComments_moitinh')) || [];
             comments.unshift(newCmt); 
             localStorage.setItem('webComments_moitinh', JSON.stringify(comments));
-
             loadComments(); 
-            
             alert("Đã đăng bình luận thành công lên web!");
             document.getElementById('pageCommentForm').reset();
             btn.innerText = "Đăng Bình Luận"; btn.disabled = false;
         });
 
-        // ===============================================================
-        // CHỨC NĂNG GỬI GÓP Ý KÍN QUA EMAIL (FIX LỖI BÁO ĐỎ VS CODE)
-        // ===============================================================
         function openFeedbackModal() { document.getElementById('feedback-modal').classList.add('active'); }
         function closeFeedbackModal() { document.getElementById('feedback-modal').classList.remove('active'); }
 
@@ -1069,25 +1058,11 @@
             var form = event.target;
             var btn = document.getElementById('fbBtn');
             btn.innerText = "ĐANG GỬI EMAIL..."; btn.disabled = true;
-
-            fetch(form.action, {
-                method: "POST",
-                body: new FormData(form),
-                headers: { 'Accept': 'application/json' }
-            })
-            .then(function(response) {
-                alert("Góp ý kín của bạn đã được gửi thành công vào email duchungvo793@gmail.com!");
-                closeFeedbackModal(); form.reset(); btn.innerText = "Gửi Email"; btn.disabled = false;
-            })
-            .catch(function(error) {
-                alert("Góp ý đã được lưu lại thành công!");
-                closeFeedbackModal(); form.reset(); btn.innerText = "Gửi Email"; btn.disabled = false;
-            });
+            fetch(form.action, { method: "POST", body: new FormData(form), headers: { 'Accept': 'application/json' } })
+            .then(function(response) { alert("Góp ý kín của bạn đã được gửi thành công vào email duchungvo793@gmail.com!"); closeFeedbackModal(); form.reset(); btn.innerText = "Gửi Email"; btn.disabled = false; })
+            .catch(function(error) { alert("Góp ý đã được lưu lại thành công!"); closeFeedbackModal(); form.reset(); btn.innerText = "Gửi Email"; btn.disabled = false; });
         });
 
-        // ===============================================================
-        // CÁC CHỨC NĂNG KHÁC
-        // ===============================================================
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             var modeText = document.getElementById('mode-text');
@@ -1133,26 +1108,165 @@
         var finaleVideo = document.getElementById('finale-video');
         var hasPlayed = false;
 
-        function closeVideo() {
-            videoOverlay.classList.remove('active'); finaleVideo.pause(); hasPlayed = false; window.scrollBy(0, -100); 
-        }
+        function closeVideo() { videoOverlay.classList.remove('active'); finaleVideo.pause(); hasPlayed = false; window.scrollBy(0, -100); }
 
         window.addEventListener('scroll', function() {
             if (!videoOverlay || finaleVideo.played.length > 0) return;
             var scrollPosition = window.innerHeight + window.scrollY;
             var bodyHeight = document.documentElement.scrollHeight;
-            if (scrollPosition >= bodyHeight - 20) {
-                videoOverlay.classList.add('active');
-                if (!hasPlayed) { finaleVideo.currentTime = 0; finaleVideo.play().catch(function(e){ console.log("Autoplay blocked."); }); hasPlayed = true; }
-            }
+            if (scrollPosition >= bodyHeight - 20) { videoOverlay.classList.add('active'); if (!hasPlayed) { finaleVideo.currentTime = 0; finaleVideo.play().catch(function(e){ console.log("Autoplay blocked."); }); hasPlayed = true; } }
         });
 
         document.getElementById('close-video-btn').addEventListener('click', closeVideo);
         finaleVideo.addEventListener('ended', closeVideo);
 
-        function toggleGemini() {
-            var w = 450; var h = 650; var left = window.screen.width - w - 50; var top = 100;
-            window.open("https://gemini.google.com/", "GeminiChat", "width="+w+",height="+h+",top="+top+",left="+left);
+        function toggleGemini() { document.getElementById('chatbot-modal').classList.toggle('active'); }
+
+        async function sendMessage() {
+            const inputField = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+            const messageText = inputField.value.trim();
+            if (messageText === "") return;
+            appendMessage(messageText, "user");
+            inputField.value = ""; 
+            chatBox.scrollTop = chatBox.scrollHeight;
+            appendMessage("Đang gõ...", "bot", true);
+            const loadingWrapper = chatBox.lastChild;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const API_KEY = "AIzaSyDpzqfmuhP8Zfyt6b3WaD7jieeXQIvIL_c"; 
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+            const currentDate = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+
+            try {
+                const requestOptions = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        system_instruction: { parts: [{ text: "Bạn là trợ lý ảo thân thiện, đóng vai trò hướng dẫn viên trên trang web lịch sử về ngày 30/4/1975. Trả lời ngắn gọn, thân thiện và lịch sự. Ngày giờ hiện tại là: " + currentDate }] },
+                        contents: [{ parts: [{ text: messageText }] }]
+                    })
+                };
+                const response = await fetch(API_URL, requestOptions);
+                const data = await response.json();
+                chatBox.removeChild(loadingWrapper);
+                if (!response.ok) {
+                    const errorMsg = data.error ? data.error.message : "Lỗi kết nối";
+                    appendMessage(`Lỗi: ${errorMsg}`, "bot");
+                    return;
+                }
+                let botReply = data.candidates[0].content.parts[0].text;
+                botReply = botReply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                appendMessage(botReply, "bot");
+            } catch (error) {
+                chatBox.removeChild(loadingWrapper);
+                appendMessage("Lỗi hệ thống. Vui lòng kiểm tra lại mạng!", "bot");
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendMessage(text, sender, isLoading = false) {
+            const chatBox = document.getElementById("chat-box");
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.className = `message-wrapper ${sender}-wrapper`;
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${sender}-message`;
+            if(isLoading) { messageDiv.style.fontStyle = "italic"; messageDiv.style.color = "#999"; }
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+            wrapperDiv.appendChild(messageDiv);
+            chatBox.appendChild(wrapperDiv);
+        }
+
+        function handleKeyPress(event) { if (event.key === "Enter") { sendMessage(); } }
+
+        // ==================== JAVASCRIPT BẢN ĐỒ HÀNG KHÔNG ====================
+        let tourMapInitialized = false; let tourMap; let tourPlaneMarker; let tourPlaneEl;
+        let tourIsFlying = false; let tourCurrentIndex = 0; let tourRouteCoords = [];
+        const tourApiKey = '9ZKf7RfbcpclzK0utmo9'; 
+        const tourLocations = [
+            { name: "Dinh Độc Lập", lng: 106.6953, lat: 10.7769 },
+            { name: "Bảo tàng Chứng tích Chiến tranh", lng: 106.6920, lat: 10.7795 },
+            { name: "Địa đạo Củ Chi", lng: 106.4615, lat: 11.1415 },
+            { name: "Bảo tàng LS Quân sự VN", lng: 105.7538, lat: 21.0093 },
+            { name: "Di tích Nhà tù Hỏa Lò", lng: 105.8464, lat: 21.0253 }
+        ];
+
+        function openTourMap() {
+            document.getElementById('map-overlay').classList.add('active');
+            if (!tourMapInitialized) {
+                initTourMap(); tourMapInitialized = true;
+            } else { setTimeout(() => tourMap.resize(), 100); }
+        }
+
+        function closeTourMap() { document.getElementById('map-overlay').classList.remove('active'); }
+
+        function initTourMap() {
+            tourMap = new maplibregl.Map({
+                container: 'map-container',
+                style: `https://api.maptiler.com/maps/hybrid/style.json?key=${tourApiKey}`,
+                center: [tourLocations[0].lng, tourLocations[0].lat],
+                zoom: 16.5, pitch: 60, bearing: 0
+            });
+
+            tourPlaneEl = document.createElement('div'); tourPlaneEl.id = 'plane-icon';
+            tourPlaneMarker = new maplibregl.Marker({ element: tourPlaneEl })
+                .setLngLat([tourLocations[0].lng, tourLocations[0].lat]).addTo(tourMap);
+
+            const btnList = document.getElementById('map-button-list');
+            tourLocations.forEach((loc, index) => {
+                const btn = document.createElement('button'); btn.className = 'map-loc-btn';
+                if (index === 0) btn.classList.add('active'); 
+                btn.innerText = `${index + 1}. ${loc.name}`;
+                btn.onclick = () => flyTourLocation(index);
+                btnList.appendChild(btn);
+            });
+
+            tourMap.on('load', () => {
+                tourMap.addSource('terrain', { type: 'raster-dem', url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${tourApiKey}`, tileSize: 256 });
+                tourMap.setTerrain({ source: 'terrain', exaggeration: 1.5 });
+                tourMap.addSource('route', { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } } });
+                tourMap.addLayer({ id: 'route-line', type: 'line', source: 'route', paint: { 'line-color': '#00e5ff', 'line-width': 5, 'line-opacity': 0.8 } });
+
+                tourLocations.forEach((loc) => {
+                    const pinContainer = document.createElement('div'); pinContainer.className = 'custom-pin-marker';
+                    const pinLabel = document.createElement('div'); pinLabel.className = 'custom-pin-label'; pinLabel.innerText = loc.name;
+                    const pinIcon = document.createElement('div'); pinIcon.className = 'custom-pin-icon';
+                    pinContainer.appendChild(pinLabel); pinContainer.appendChild(pinIcon);
+                    new maplibregl.Marker({ element: pinContainer, offset: [0, 15] }).setLngLat([loc.lng, loc.lat]).addTo(tourMap);
+                });
+            });
+
+            let lastCenter = tourMap.getCenter();
+            tourMap.on('move', () => {
+                if (!tourIsFlying) { lastCenter = tourMap.getCenter(); return; }
+                const currentCenter = tourMap.getCenter();
+                const lng = currentCenter.lng; const lat = currentCenter.lat;
+                tourPlaneMarker.setLngLat([lng, lat]);
+                if (Math.abs(lng - lastCenter.lng) > 0.00001 || Math.abs(lat - lastCenter.lat) > 0.00001) {
+                    let dx = lng - lastCenter.lng; let dy = lat - lastCenter.lat;
+                    let theta = Math.atan2(dx, dy); let bearing = (theta * 180 / Math.PI);
+                    bearing = bearing > 0 ? bearing : (360 + bearing);
+                    tourPlaneEl.style.transform = `rotate(${bearing}deg)`;
+                }
+                tourRouteCoords.push([lng, lat]);
+                tourMap.getSource('route').setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: tourRouteCoords } });
+                lastCenter = currentCenter;
+            });
+        }
+
+        function flyTourLocation(index) {
+            if (tourIsFlying || index === tourCurrentIndex) return;
+            tourIsFlying = true; tourCurrentIndex = index;
+            document.querySelectorAll('.map-loc-btn').forEach((b, i) => {
+                b.classList.remove('active'); b.disabled = true; 
+                if (i === index) b.classList.add('active');
+            });
+            const target = tourLocations[index];
+            tourRouteCoords = [[tourMap.getCenter().lng, tourMap.getCenter().lat]];
+            tourMap.flyTo({ center: [target.lng, target.lat], zoom: 16.5, speed: 0.15, curve: 1.6, essential: true });
+            tourMap.once('moveend', () => {
+                tourIsFlying = false; document.querySelectorAll('.map-loc-btn').forEach(b => b.disabled = false);
+            });
         }
     </script>
 </body>
